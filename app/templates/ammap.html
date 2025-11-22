@@ -1,0 +1,53 @@
+<!-- app/templates/ammap.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Карта регионов России - AmCharts</title>
+
+    <!-- AmCharts 5 -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/russiaLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/ammap.css') }}">
+</head>
+<body>
+    <div id="chartdiv">
+        <div class="loading">Загрузка карты России...</div>
+    </div>
+
+    <div class="search-container">
+        <h3>🔍 Поиск региона</h3>
+        <input type="text" 
+               id="regionSearch" 
+               placeholder="Введите название региона..." 
+               autocomplete="off">
+        <div id="searchResults" class="search-results"></div>
+    </div>
+
+    <button id="backButton" class="back-button" onclick="goBackToMap()" style="display: none;">
+        ← Назад к карте
+    </button>
+
+    <!-- External JavaScript -->
+    <script src="{{ url_for('static', path='/js/ammap.js') }}"></script>
+    
+    <script>
+        // Данные регионов из шаблона (Python -> JS)
+        // Используем сериализацию в JSON чтобы корректно передать массив объектов в JavaScript
+        const regionsDataFromTemplate = {{ regions | tojson | safe }};
+
+        // Инициализация карты после загрузки DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM загружен. Регионов из шаблона:', regionsDataFromTemplate.length);
+            console.log('Первый регион:', regionsDataFromTemplate[0]);
+            initAmMap(regionsDataFromTemplate);
+        });
+    </script>
+</body>
+</html>

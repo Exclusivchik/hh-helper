@@ -1,0 +1,323 @@
+/* app/static/css/style.css */
+
+/* Leaflet Map Styles */
+.leaflet-popup-content {
+    margin: 8px 12px;
+    font-family: Arial, sans-serif;
+}
+
+.city-marker {
+    background-color: #e74c3c;
+    border-radius: 50%;
+    width: 12px;
+    height: 12px;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.city-marker:hover {
+    background-color: #c0392b;
+    transform: scale(1.2);
+}
+
+/* City Popup Styles */
+.city-popup {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+.city-popup h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+.city-popup p {
+    margin: 5px 0;
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+.popup-btn {
+    margin: 3px;
+    padding: 6px 12px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background 0.2s ease;
+}
+
+.popup-btn:hover {
+    background: #2980b9;
+}
+
+/* Notification Styles - Bottom Center */
+.notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    z-index: 10000;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 250px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.notification-success {
+    background: #27ae60;
+}
+
+.notification-error {
+    background: #e74c3c;
+}
+
+.notification-warning {
+    background: #f39c12;
+}
+
+.notification-info {
+    background: #3498db;
+}
+
+/* Error Message Styles */
+.error-message {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* AmCharts Notification Styles - Bottom Center */
+.am-notification {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 24px;
+    color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    z-index: 10000;
+    font-size: 14px;
+    font-weight: 500;
+    min-width: 250px;
+    text-align: center;
+    pointer-events: none;
+}
+
+.am-notification-success {
+    background: #27ae60;
+}
+
+.am-notification-error {
+    background: #e74c3c;
+}
+
+.am-notification-warning {
+    background: #f39c12;
+}
+
+.am-notification-info {
+    background: #3498db;
+}
+
+/* Animations - Bottom Center Slide */
+@keyframes slideUpFromBottom {
+    from {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideDownToBottom {
+    from {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(-50%) translateY(100px);
+        opacity: 0;
+    }
+}
+
+/* Search Container Styles */
+.search-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    backdrop-filter: blur(5px);
+    min-width: 300px;
+}
+
+.search-container h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 16px;
+}
+
+#regionSearch {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+    outline: none;
+    box-sizing: border-box;
+}
+
+#regionSearch:focus {
+    border-color: #3498db;
+}
+
+.search-results {
+    margin-top: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+.search-results.active {
+    display: block;
+}
+
+.search-result-item {
+    padding: 10px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 4px;
+    background: #f8f9fa;
+    transition: background 0.2s;
+    font-size: 13px;
+}
+
+.search-result-item:hover {
+    background: #e3f2fd;
+}
+
+.search-result-item strong {
+    color: #2c3e50;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.search-result-item small {
+    color: #7f8c8d;
+}
+
+.no-results {
+    padding: 10px;
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 13px;
+}
+
+/* Scrollbar Styles */
+.search-results::-webkit-scrollbar {
+    width: 6px;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .search-container {
+        top: 10px;
+        left: 10px;
+        min-width: calc(100vw - 20px);
+        max-width: calc(100vw - 20px);
+        padding: 12px;
+    }
+
+    .search-container h3 {
+        font-size: 14px;
+    }
+
+    #regionSearch {
+        font-size: 13px;
+        padding: 8px 10px;
+    }
+
+    .search-results {
+        max-height: 200px;
+    }
+
+    .search-result-item {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .controls {
+        top: auto;
+        bottom: 10px;
+        right: 10px;
+        padding: 8px;
+    }
+
+    .controls button {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+
+    .notification,
+    .am-notification {
+        min-width: 200px;
+        max-width: 300px;
+        font-size: 12px;
+        padding: 10px 15px;
+        bottom: 20px;
+    }
+
+    .city-popup h3 {
+        font-size: 14px;
+    }
+
+    .city-popup p {
+        font-size: 11px;
+    }
+    
+    .region-info {
+        bottom: 70px;
+        right: 10px;
+        left: 10px;
+        max-width: calc(100vw - 20px);
+    }
+}
