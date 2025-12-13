@@ -5,6 +5,8 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from app.services.hh_api import hh_api_client, get_amcharts_to_hh_mapping, build_region_mapping
+
 router = APIRouter(prefix="/ammap", tags=["ammap"])
 
 # Настройка путей
@@ -121,25 +123,85 @@ async def get_regions_data():
     return {"regions": russia_regions}
 
 
-@router.get("/region/{region_id}")
-async def get_region_info(region_id: str):
+@router.get("/professional-roles")
+async def get_professional_roles():
     """
-    API endpoint для получения информации о конкретном регионе
+    API endpoint для получения профессиональных ролей из HH.ru
+    """
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    data = await hh_api_client.get_professional_roles()
+    
+    # Выводим все должности в лог
+    logger.info("=== ПРОФЕССИОНАЛЬНЫЕ РОЛИ ИЗ HH.RU ===")
+    
+    for category in data.get('categories', []):
+        logger.info(f"\nКатегория: {category.get('name')} (ID: {category.get('id')})")
+        
+        for role in category.get('roles', []):
+            logger.info(f"  - {role.get('name')} (ID: {role.get('id')})")
+    
+    return data
+
+
+async def get_hh_area_id(region_id: str) -> str:
+    """
+    Получает HH.ru area ID по AmCharts region ID
+    """
+    from app.services.hh_api import find_area_id_by_name
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    # Получаем маппинг AmCharts ID -> название региона
+    amcharts_mapping = get_amcharts_to_hh_mapping()
+    region_name = amcharts_mapping.get(region_id)
+    
+    logger.info(f"Looking for region: {region_id} -> {region_name}")
+    
+    if not region_name:
+        logger.warning(f"Region {region_id} not found in mapping")
+        return "113"  # Вся Россия по умолчанию
+    
+    # Получаем список регионов из HH.ru
+    areas = await hh_api_client.get_areas()
+    
+    # Создаем маппинг название -> ID
+    name_to_id = build_region_mapping(areas)
+    
+    # Находим ID по названию с поддержкой частичного совпадения
+    hh_area_id = find_area_id_by_name(name_to_id, region_name)
+    
+    if not hh_area_id:
+        logger.warning(f"HH area not found for '{region_name}', using Russia (113)")
+        hh_area_id = "113"
+    else:
+        logger.info(f"Found HH area ID: {hh_area_id} for region '{region_name}'")
+    
+    return hh_area_id
+
+
+@router.get("/region/{region_id}", response_class=HTMLResponse)
+async def get_region_page(request: Request, region_id: str):
+    """
+    Страница с информацией о конкретном регионе
     """
     region = next((r for r in russia_regions if r["id"] == region_id), None)
     if not region:
-        return {"error": "Регион не найден"}
+        return HTMLResponse(content="<h1>Регион не найден</h1>", status_code=404)
 
-    # Дополнительная информация о регионе
-    region_info = {
-        **region,
-        "description": f"Регион {region['name']} с населением {region['value']:,} человек",
-        "vacancies_count": 1500,  # Примерное количество вакансий
-        "average_salary": 65000,  # Примерная средняя зарплата
-        "major_industries": ["IT", "Промышленность", "Строительство"]
-    }
-
-    return {"region": region_info}
+    # Получаем ID региона для HH.ru через маппинг
+    hh_area_id = await get_hh_area_id(region_id)
+    
+    return templates.TemplateResponse(
+        "region.html",
+        {
+            "request": request,
+            "region": region,
+            "hh_area_id": hh_area_id
+        }
+    )
 
 
 @router.get("/vacancies/{region_id}")

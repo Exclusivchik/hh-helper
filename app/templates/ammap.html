@@ -34,6 +34,10 @@
         ← Назад к карте
     </button>
 
+    <button id="detailsButton" class="details-button" onclick="goToRegionDetails()" style="display: none;">
+        Подробнее о регионе
+    </button>
+
     <!-- External JavaScript -->
     <script src="{{ url_for('static', path='/js/ammap.js') }}"></script>
     
@@ -44,8 +48,8 @@
 
         // Инициализация карты после загрузки DOM
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM загружен. Регионов из шаблона:', regionsDataFromTemplate.length);
-            console.log('Первый регион:', regionsDataFromTemplate[0]);
+            ('DOM загружен. Регионов из шаблона:', regionsDataFromTemplate.length);
+            ('Первый регион:', regionsDataFromTemplate[0]);
             initAmMap(regionsDataFromTemplate);
         });
     </script>

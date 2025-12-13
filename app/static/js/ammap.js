@@ -8,13 +8,14 @@ let zoomEnabled = true;
 let regionsData = [];
 let isZoomedToRegion = false;
 let initialMapState = null;  // Сохраняем начальное состояние карты
+let selectedRegionId = null;  // ID выбранного региона для перехода на страницу
 
 /**
  * Инициализация карты AmCharts
  */
 function initAmMap(regions) {
     regionsData = regions || [];
-    console.log('initAmMap вызван с', regionsData.length, 'регионами');
+    ('initAmMap вызван с', regionsData.length, 'регионами');
     
     am5.ready(function() {
         try {
@@ -75,7 +76,7 @@ function initAmMap(regions) {
                 latitude: 65,
                 zoomLevel: 0.75
             };
-            console.log('Начальное состояние установлено:', initialMapState);
+            ('Начальное состояние установлено:', initialMapState);
 
             // Базовая настройка полигонов (без анимаций)
             polygonSeries.mapPolygons.template.setAll({
@@ -99,7 +100,7 @@ function initAmMap(regions) {
 
             // Выводим ВСЕ реальные ID из AmCharts geodata для диагностики
             setTimeout(() => {
-                console.log('=== ПОЛНЫЙ СПИСОК ID РЕГИОНОВ В AMCHARTS GEODATA ===');
+                ('=== ПОЛНЫЙ СПИСОК ID РЕГИОНОВ В AMCHARTS GEODATA ===');
                 const allGeoData = [];
                 polygonSeries.mapPolygons.each(function(polygon) {
                     const data = polygon.dataItem.dataContext;
@@ -111,22 +112,20 @@ function initAmMap(regions) {
                     }
                 });
                 allGeoData.sort((a, b) => a.name.localeCompare(b.name, 'ru'));
-                console.table(allGeoData);
-                console.log('Всего регионов в geodata:', allGeoData.length);
             }, 1000);
             
             // Устанавливаем данные
             if (regionsData.length > 0) {
-                console.log('Установка данных регионов:', regionsData.length);
+                ('Установка данных регионов:', regionsData.length);
                 polygonSeries.data.setAll(regionsData);
-                console.log('polygonSeries создан:', polygonSeries);
-                console.log('Количество полигонов:', polygonSeries.mapPolygons.length);
+                ('polygonSeries создан:', polygonSeries);
+                ('Количество полигонов:', polygonSeries.mapPolygons.length);
                 
                 // Ждем инициализации серии полигонов
                 polygonSeries.events.once("inited", function() {
-                    console.log('polygonSeries инициализирована, ждем 1.5 сек и позиционируем');
+                    ('polygonSeries инициализирована, ждем 1.5 сек и позиционируем');
                     setTimeout(() => {
-                        console.log('НАЧИНАЕМ ПОЗИЦИОНИРОВАНИЕ КАРТЫ');
+                        ('НАЧИНАЕМ ПОЗИЦИОНИРОВАНИЕ КАРТЫ');
                         chart.zoomToGeoPoint(
                             { 
                                 longitude: initialMapState.longitude, 
@@ -136,11 +135,11 @@ function initAmMap(regions) {
                             true,
                             600
                         );
-                        console.log('Карта возвращена к начальному состоянию');
+                        ('Карта возвращена к начальному состоянию');
                     }, 1500);
                 });
             } else {
-                console.warn('Нет данных о регионах для отображения');
+                warn('Нет данных о регионах для отображения');
             }
 
             // Настраиваем цветовую схему
@@ -154,7 +153,7 @@ function initAmMap(regions) {
 
             // Ждем создания всех полигонов и устанавливаем обработчики
             setTimeout(() => {
-                console.log('Устанавливаем обработчики клика на все полигоны');
+                ('Устанавливаем обработчики клика на все полигоны');
                 let clickableCount = 0;
                 
                 polygonSeries.mapPolygons.each(function(polygon) {
@@ -164,14 +163,14 @@ function initAmMap(regions) {
                     
                     // Устанавливаем обработчик клика напрямую
                     polygon.events.on("click", function(ev) {
-                        console.log('!!! КЛИК ЗАРЕГИСТРИРОВАН !!!', ev);
+                        ('!!! КЛИК ЗАРЕГИСТРИРОВАН !!!', ev);
                         try {
                             const data = ev.target.dataItem.dataContext;
-                            console.log('Клик по региону:', data);
-                            console.log('isZoomedToRegion:', isZoomedToRegion);
+                            ('Клик по региону:', data);
+                            ('isZoomedToRegion:', isZoomedToRegion);
                             
                             if (data && !isZoomedToRegion) {
-                        console.log('Обрабатываем клик по региону:', data.name);
+                        ('Обрабатываем клик по региону:', data.name);
                         // Показываем информацию о регионе
                         showRegionInfo(data);
                         
@@ -237,7 +236,7 @@ function initAmMap(regions) {
                                     zoomLevel = 2.5; // Очень большие регионы
                                 }
                                 
-                                console.log(`Регион: ${data.name}, площадь: ${area.toFixed(2)}, зум: ${zoomLevel}`);
+                                (`Регион: ${data.name}, площадь: ${area.toFixed(2)}, зум: ${zoomLevel}`);
                             }
                             
                             // Приближаемся к региону
@@ -249,24 +248,31 @@ function initAmMap(regions) {
                             );
                         }
                         
-                        // Устанавливаем флаг и показываем кнопку "Назад"
+                        // Устанавливаем флаг и показываем кнопки
                         isZoomedToRegion = true;
+                        selectedRegionId = data.id;
+                        
                         const backButton = document.getElementById('backButton');
                         if (backButton) {
                             backButton.style.display = 'block';
                         }
                         
+                        const detailsButton = document.getElementById('detailsButton');
+                        if (detailsButton) {
+                            detailsButton.style.display = 'block';
+                        }
+                        
                         showAmNotification(`Регион: ${data.name}`, 'info');
                     }
                 } catch (error) {
-                    console.error('Ошибка обработки клика по региону:', error);
+                    error('Ошибка обработки клика по региону:', error);
                 }
                     });
                     
                     clickableCount++;
                 });
                 
-                console.log(`Установлено обработчиков клика: ${clickableCount}`);
+                (`Установлено обработчиков клика: ${clickableCount}`);
             }, 500);
 
             // Обработчик наведения курсора
@@ -274,7 +280,7 @@ function initAmMap(regions) {
                 try {
                     ev.target.states.applyAnimate("hover");
                 } catch (error) {
-                    console.error('Ошибка обработки наведения:', error);
+                    error('Ошибка обработки наведения:', error);
                 }
             });
 
@@ -282,7 +288,7 @@ function initAmMap(regions) {
                 try {
                     ev.target.states.applyAnimate("default");
                 } catch (error) {
-                    console.error('Ошибка обработки ухода курсора:', error);
+                    error('Ошибка обработки ухода курсора:', error);
                 }
             });
 
@@ -297,7 +303,7 @@ function initAmMap(regions) {
             window.amPolygonSeries = polygonSeries;
             window.amRoot = root;
 
-            console.log("Карта России успешно инициализирована");
+            ("Карта России успешно инициализирована");
             
             showAmNotification('Карта загружена', 'success');
             goBackToMap();
@@ -306,7 +312,7 @@ function initAmMap(regions) {
             initRegionSearch();
 
         } catch (error) {
-            console.error("Ошибка инициализации карты:", error);
+            error("Ошибка инициализации карты:", error);
             const loadingEl = document.querySelector('.loading');
             if (loadingEl) {
                 loadingEl.innerHTML = `
@@ -329,11 +335,9 @@ function initAmMap(regions) {
  */
 function centerMap() {
     if (!chart || !polygonSeries || !initialMapState) {
-        console.warn('Карта не инициализирована или состояние не сохранено');
+        warn('Карта не инициализирована или состояние не сохранено');
         return;
     }
-    
-    console.log('centerMap вызвана. initialMapState:', initialMapState);
     
     try {
         // Восстанавливаем все полигоны
@@ -366,10 +370,10 @@ function centerMap() {
                 true,
                 600
             );
-            console.log('Карта возвращена к начальному состоянию');
+            ('Карта возвращена к начальному состоянию');
         }, 50);
     } catch (error) {
-        console.error('Ошибка центрирования карты:', error);
+        error('Ошибка центрирования карты:', error);
     }
 }
 
@@ -386,7 +390,7 @@ function showRegionInfo(region) {
  */
 function zoomToHome() {
     if (!chart) {
-        console.warn('Карта не инициализирована');
+        warn('Карта не инициализирована');
         return;
     }
     
@@ -398,7 +402,7 @@ function zoomToHome() {
         }
         showAmNotification('Показана вся Россия', 'info');
     } catch (error) {
-        console.error('Ошибка возврата к начальному виду:', error);
+        error('Ошибка возврата к начальному виду:', error);
     }
 }
 
@@ -407,7 +411,7 @@ function zoomToHome() {
  */
 function zoomToCenter() {
     if (!chart) {
-        console.warn('Карта не инициализирована');
+        warn('Карта не инициализирована');
         return;
     }
     
@@ -415,7 +419,7 @@ function zoomToCenter() {
         chart.zoomToGeoPoint({ longitude: 90, latitude: 60 }, 2.5, true);
         showAmNotification('Приближено к центру России', 'info');
     } catch (error) {
-        console.error('Ошибка приближения к центру:', error);
+        error('Ошибка приближения к центру:', error);
     }
 }
 
@@ -424,7 +428,7 @@ function zoomToCenter() {
  */
 function resetView() {
     if (!chart || !polygonSeries) {
-        console.warn('Карта не инициализирована');
+        warn('Карта не инициализирована');
         return;
     }
     
@@ -440,13 +444,13 @@ function resetView() {
             try {
                 polygon.states.applyAnimate("default");
             } catch (e) {
-                console.error('Ошибка сброса состояния полигона:', e);
+                error('Ошибка сброса состояния полигона:', e);
             }
         });
         
         showAmNotification('Вид сброшен', 'success');
     } catch (error) {
-        console.error('Ошибка сброса вида:', error);
+        error('Ошибка сброса вида:', error);
     }
 }
 
@@ -455,7 +459,7 @@ function resetView() {
  */
 function toggleZoom() {
     if (!chart) {
-        console.warn('Карта не инициализирована');
+        warn('Карта не инициализирована');
         return;
     }
     
@@ -467,7 +471,7 @@ function toggleZoom() {
             zoomEnabled ? 'success' : 'info'
         );
     } catch (error) {
-        console.error('Ошибка переключения zoom:', error);
+        error('Ошибка переключения zoom:', error);
     }
 }
 
@@ -476,7 +480,7 @@ function toggleZoom() {
  */
 function goBackToMap() {
     if (!chart) {
-        console.warn('Карта не инициализирована');
+        warn('Карта не инициализирована');
         return;
     }
     
@@ -484,19 +488,38 @@ function goBackToMap() {
         // Центрируем карту
         centerMap();
         
-        // Скрываем кнопку "Назад"
+        // Скрываем кнопки
         const backButton = document.getElementById('backButton');
         if (backButton) {
             backButton.style.display = 'none';
         }
         
-        // Сбрасываем флаг
+        const detailsButton = document.getElementById('detailsButton');
+        if (detailsButton) {
+            detailsButton.style.display = 'none';
+        }
+        
+        // Сбрасываем флаги
         isZoomedToRegion = false;
+        selectedRegionId = null;
         
         showAmNotification('Возврат к карте России', 'info');
     } catch (error) {
-        console.error('Ошибка возврата к карте:', error);
+        error('Ошибка возврата к карте:', error);
     }
+}
+
+/**
+ * Функция для перехода на страницу с деталями региона
+ */
+function goToRegionDetails() {
+    if (!selectedRegionId) {
+        warn('Регион не выбран');
+        return;
+    }
+    
+    // Переход на страницу региона
+    window.location.href = `/ammap/region/${selectedRegionId}`;
 }
 
 /**
@@ -517,7 +540,7 @@ window.addEventListener('resize', function() {
                 root.resize();
             }, 100);
         } catch (error) {
-            console.error('Ошибка изменения размера карты:', error);
+            error('Ошибка изменения размера карты:', error);
         }
     }
 });
@@ -537,11 +560,11 @@ function initRegionSearch() {
     const searchResults = document.getElementById('searchResults');
     
     if (!searchInput || !searchResults) {
-        console.warn('Элементы поиска не найдены');
+        warn('Элементы поиска не найдены');
         return;
     }
     
-    console.log('Поиск инициализирован. Регионов загружено:', regionsData.length);
+    ('Поиск инициализирован. Регионов загружено:', regionsData.length);
     
     // Обработчик ввода текста
     searchInput.addEventListener('input', function(e) {
@@ -565,7 +588,7 @@ function initRegionSearch() {
                    (region.capital && region.capital.toLowerCase().includes(query));
         });
         
-        console.log(`Поиск "${query}": найдено ${matches.length} регионов`);
+        (`Поиск "${query}": найдено ${matches.length} регионов`);
         displaySearchResults(matches, query);
     });
     
@@ -712,7 +735,7 @@ function selectRegion(regionId) {
                                     zoomLevel = 2.5; // Очень большие регионы
                                 }
                                 
-                                console.log(`Поиск - Регион: ${region.name}, площадь: ${area.toFixed(2)}, зум: ${zoomLevel}`);
+                                (`Поиск - Регион: ${region.name}, площадь: ${area.toFixed(2)}, зум: ${zoomLevel}`);
                             }
                             
                             // Приближаемся к региону с плавной анимацией
@@ -724,11 +747,18 @@ function selectRegion(regionId) {
                             );
                         }
                         
-                        // Устанавливаем флаг и показываем кнопку "Назад"
+                        // Устанавливаем флаг и показываем кнопки
                         isZoomedToRegion = true;
+                        selectedRegionId = regionId;
+                        
                         const backButton = document.getElementById('backButton');
                         if (backButton) {
                             backButton.style.display = 'block';
+                        }
+                        
+                        const detailsButton = document.getElementById('detailsButton');
+                        if (detailsButton) {
+                            detailsButton.style.display = 'block';
                         }
                         
                         showAmNotification(`Регион: ${region.name}`, 'success');
@@ -745,7 +775,7 @@ function selectRegion(regionId) {
         }, isZoomedToRegion ? 700 : 0); // Задержка только если уже приближены
         
     } catch (error) {
-        console.error('Ошибка при выборе региона:', error);
+        error('Ошибка при выборе региона:', error);
         showAmNotification('Ошибка при переходе к региону', 'error');
     }
 }

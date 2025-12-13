@@ -112,7 +112,7 @@ async def search_vacancies(
         locale: str = Query("RU", description="Идентификатор локали"),
         host: HostEnum = Query(HostEnum.HH_RU, description="Доменное имя сайта"),
 
-        hh_user_agent: str = Header(..., alias="HH-User-Agent", description="Название приложения и контактная почта"),
+        hh_user_agent: str = Header("HHHelper/1.0 (damir.exclusivchik@example.com)", alias="User-Agent", description="Название приложения и контактная почта"),
         authorization: Optional[str] = Header(None, alias="Authorization", description="OAuth токен")
 ):
     """

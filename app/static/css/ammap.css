@@ -120,6 +120,33 @@ body {
     transform: translateY(0);
 }
 
+/* Details Button */
+.details-button {
+    position: absolute;
+    top: 75px;
+    right: 20px;
+    z-index: 1000;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 4px 20px rgba(39, 174, 96, 0.3);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.details-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(39, 174, 96, 0.4);
+}
+
+.details-button:active {
+    transform: translateY(0);
+}
+
 /* Controls Panel */
 .controls {
     position: absolute;
