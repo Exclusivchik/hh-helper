@@ -1,0 +1,176 @@
+/* region.css - Стили для страницы региона */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.header {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    margin: 0 0 10px 0;
+    font-size: 36px;
+}
+
+.region-id {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+
+.back-button:hover {
+    transform: translateY(-2px);
+}
+
+.vacancies-container {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+}
+
+.vacancies-container h2 {
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    font-size: 28px;
+}
+
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+    font-size: 18px;
+}
+
+.vacancy-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.vacancy-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.vacancy-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.vacancy-title a {
+    color: #667eea;
+    text-decoration: none;
+}
+
+.vacancy-title a:hover {
+    text-decoration: underline;
+}
+
+.vacancy-company {
+    color: #7f8c8d;
+    margin-bottom: 10px;
+}
+
+.vacancy-salary {
+    color: #27ae60;
+    font-weight: bold;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.vacancy-details {
+    color: #555;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.error {
+    color: #e74c3c;
+    text-align: center;
+    padding: 40px;
+}
+
+.vacancy-count {
+    color: #7f8c8d;
+    margin-bottom: 20px;
+}
+
+/* Стили для статистики по зарплатам */
+.salary-stats {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+}
+
+.salary-stats h3 {
+    color: #2c3e50;
+    margin: 0 0 20px 0;
+    font-size: 22px;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.stat-label {
+    color: #7f8c8d;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.stat-value {
+    color: #27ae60;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.stats-info {
+    text-align: center;
+    color: #7f8c8d;
+    font-size: 13px;
+    margin: 10px 0 0 0;
+}

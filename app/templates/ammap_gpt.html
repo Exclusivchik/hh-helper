@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Интерактивная карта регионов России</title>
+
+    <!-- AmCharts 5 -->
+    <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/map.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/geodata/russiaLow.js"></script>
+    <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/ammap.css') }}">
+</head>
+<body>
+
+<header class="top-bar">
+    <div class="top-bar__title">🗺️ Интерактивная карта регионов России</div>
+    <div class="top-bar__subtitle">Выберите регион на карте или через поиск</div>
+</header>
+
+<div id="chartdiv">
+    <div class="loading">Загрузка карты…</div>
+</div>
+
+<div class="search-container">
+    <h3>🔍 Поиск региона</h3>
+    <input id="regionSearch" placeholder="Введите название региона…" autocomplete="off">
+    <div id="searchResults" class="search-results"></div>
+</div>
+
+<button id="backButton" class="back-button" onclick="goBackToMap()" style="display:none">
+    ← Назад
+</button>
+
+<button id="deta

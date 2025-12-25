@@ -1,5 +1,6 @@
 # main.py
 import logging
+import sys
 from contextlib import asynccontextmanager
 
 import uvicorn
@@ -9,14 +10,15 @@ from fastapi.staticfiles import StaticFiles
 
 from app.routers import vacancies, ammap
 
-# Настройка логирования
+# Настройка логирования с поддержкой UTF-8
+file_handler = logging.FileHandler("app.log", encoding='utf-8')
+stream_handler = logging.StreamHandler(sys.stdout)
+stream_handler.stream.reconfigure(encoding='utf-8') if hasattr(stream_handler.stream, 'reconfigure') else None
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    handlers=[
-        logging.FileHandler("app.log"),
-        logging.StreamHandler()
-    ]
+    handlers=[file_handler, stream_handler]
 )
 
 logger = logging.getLogger(__name__)

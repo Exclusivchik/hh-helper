@@ -262,6 +262,9 @@ function initAmMap(regions) {
                             detailsButton.style.display = 'block';
                         }
                         
+                        // Загружаем статистику по региону
+                        loadRegionStatsById(data.id, data.name);
+                        
                         showAmNotification(`Регион: ${data.name}`, 'info');
                     }
                 } catch (error) {
@@ -498,6 +501,9 @@ function goBackToMap() {
         if (detailsButton) {
             detailsButton.style.display = 'none';
         }
+        
+        // Скрываем панель статистики
+        closeStatsPanel();
         
         // Сбрасываем флаги
         isZoomedToRegion = false;
@@ -761,6 +767,9 @@ function selectRegion(regionId) {
                             detailsButton.style.display = 'block';
                         }
                         
+                        // Загружаем статистику по региону
+                        loadRegionStatsById(regionId, region.name);
+                        
                         showAmNotification(`Регион: ${region.name}`, 'success');
                     } else {
                         // Затемняем все остальные регионы
@@ -807,3 +816,160 @@ window.resetView = resetView;
 window.toggleZoom = toggleZoom;
 window.selectRegion = selectRegion;
 window.searchRegionByName = searchRegionByName;
+
+/**
+ * Загрузка и отображение статистики по региону
+ */
+async function loadRegionStats(regionId, regionName, hhAreaId) {
+    const statsPanel = document.getElementById('statsPanel');
+    const statsRegionName = document.getElementById('statsRegionName');
+    const statsContent = document.getElementById('statsContent');
+    
+    // Показываем панель
+    statsPanel.style.display = 'block';
+    statsRegionName.textContent = regionName;
+    statsContent.innerHTML = '<div class="loading-stats">Загрузка статистики...</div>';
+    
+    try {
+        // Поисковый запрос для ML/AI вакансий
+        const AI_ML_SEARCH_QUERY = '"внедрение ИИ" OR "AI integration" OR "AI внедрение" OR "AI engineer" OR "AI разработчик" OR "инженер по ИИ" OR "LLM" OR "GPT" OR "языковые модели" OR "RAG" OR "retrieval augmented generation" OR "нейросети" OR "интеграция нейросетей" OR "машинное обучение" OR "ML" OR "ML разработчик" OR "автоматизация ИИ" OR "AI автоматизация" OR "AI solutions" OR "AI решения" OR "AI consultant" OR "консультант по ИИ"';
+        const searchQuery = encodeURIComponent(AI_ML_SEARCH_QUERY);
+        const url = `/vacancies?area=${hhAreaId}&per_page=50&text=${searchQuery}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        if (data.items && data.items.length > 0) {
+            const stats = calculateSalaryStats(data.items);
+            statsContent.innerHTML = renderSalaryStatsPanel(stats, data.found);
+        } else {
+            statsContent.innerHTML = '<p style="text-align: center; color: #7f8c8d;">Вакансии не найдены</p>';
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки статистики:', error);
+        statsContent.innerHTML = '<div class="error">Ошибка загрузки статистики</div>';
+    }
+}
+
+/**
+ * Загрузка статистики с получением HH Area ID
+ */
+async function loadRegionStatsById(regionId, regionName) {
+    const statsPanel = document.getElementById('statsPanel');
+    const statsRegionName = document.getElementById('statsRegionName');
+    const statsContent = document.getElementById('statsContent');
+    
+    // Показываем панель с загрузкой
+    statsPanel.style.display = 'block';
+    statsRegionName.textContent = regionName;
+    statsContent.innerHTML = '<div class="loading-stats">Загрузка статистики...</div>';
+    
+    try {
+        // Получаем HH Area ID для региона
+        const response = await fetch(`/ammap/region/${regionId}`);
+        const html = await response.text();
+        
+        // Парсим HTML чтобы найти HH_AREA_ID
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const scripts = doc.querySelectorAll('script');
+        let hhAreaId = null;
+        
+        scripts.forEach(script => {
+            const match = script.textContent.match(/const HH_AREA_ID = '(\d+)'/);
+            if (match) {
+                hhAreaId = match[1];
+            }
+        });
+        
+        if (hhAreaId) {
+            // Загружаем статистику
+            await loadRegionStats(regionId, regionName, hhAreaId);
+        } else {
+            statsContent.innerHTML = '<div class="error">Не удалось получить ID региона</div>';
+        }
+    } catch (error) {
+        console.error('Ошибка получения HH Area ID:', error);
+        statsContent.innerHTML = '<div class="error">Ошибка загрузки статистики</div>';
+    }
+}
+
+/**
+ * Расчет статистики по зарплатам
+ */
+function calculateSalaryStats(vacancies) {
+    const salaries = [];
+    
+    vacancies.forEach(vacancy => {
+        if (vacancy.salary) {
+            if (vacancy.salary.from && vacancy.salary.to) {
+                salaries.push((vacancy.salary.from + vacancy.salary.to) / 2);
+            } else if (vacancy.salary.from) {
+                salaries.push(vacancy.salary.from);
+            } else if (vacancy.salary.to) {
+                salaries.push(vacancy.salary.to);
+            }
+        }
+    });
+    
+    if (salaries.length === 0) {
+        return null;
+    }
+    
+    const min = Math.min(...salaries);
+    const max = Math.max(...salaries);
+    const avg = salaries.reduce((sum, val) => sum + val, 0) / salaries.length;
+    
+    return {
+        min: Math.round(min),
+        max: Math.round(max),
+        avg: Math.round(avg),
+        count: salaries.length,
+        total: vacancies.length
+    };
+}
+
+/**
+ * Рендеринг статистики по зарплатам для панели
+ */
+function renderSalaryStatsPanel(stats, totalFound) {
+    if (!stats) {
+        return '<div class="salary-stats"><p>Нет данных о зарплатах</p></div>';
+    }
+    
+    return `
+        <div class="salary-stats">
+            <h4>💰 Зарплаты</h4>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Минимальная</div>
+                    <div class="stat-value">${stats.min.toLocaleString('ru-RU')} ₽</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Средняя</div>
+                    <div class="stat-value">${stats.avg.toLocaleString('ru-RU')} ₽</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Максимальная</div>
+                    <div class="stat-value">${stats.max.toLocaleString('ru-RU')} ₽</div>
+                </div>
+            </div>
+            <p class="stats-info">На основе ${stats.count} из ${stats.total} вакансий с указанной зарплатой</p>
+        </div>
+        <div class="vacancy-count-panel">
+            Всего найдено вакансий: <strong>${totalFound.toLocaleString('ru-RU')}</strong>
+        </div>
+    `;
+}
+
+/**
+ * Закрытие панели статистики
+ */
+function closeStatsPanel() {
+    const statsPanel = document.getElementById('statsPanel');
+    statsPanel.style.display = 'none';
+}
+
+// Экспорт новых функций
+window.loadRegionStats = loadRegionStats;
+window.closeStatsPanel = closeStatsPanel;

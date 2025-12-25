@@ -14,7 +14,7 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', path='/css/ammap.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/ammap.css') }}?v=5">
 </head>
 <body>
     <div id="chartdiv">
@@ -38,8 +38,16 @@
         Подробнее о регионе
     </button>
 
+    <!-- Панель статистики -->
+    <div id="statsPanel" class="stats-panel" style="display: none;">
+        <h3 id="statsRegionName">Статистика по региону</h3>
+        <div id="statsContent" class="stats-content">
+            <div class="loading-stats">Загрузка статистики...</div>
+        </div>
+    </div>
+
     <!-- External JavaScript -->
-    <script src="{{ url_for('static', path='/js/ammap.js') }}"></script>
+    <script src="{{ url_for('static', path='/js/ammap.js') }}?v=5"></script>
     
     <script>
         // Данные регионов из шаблона (Python -> JS)

@@ -1,0 +1,35 @@
+<!-- app/templates/region.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ region.name }} - Вакансии</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/region.css') }}?v=3">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>{{ region.name }}</h1>
+            <div class="region-id">ID региона: {{ region.id }} | HH.ru Area ID: {{ hh_area_id }}</div>
+            <a href="/ammap" class="back-button">← Вернуться к карте</a>
+        </div>
+        
+        <div class="vacancies-container">
+            <h2>Вакансии в регионе</h2>
+            <div id="vacancies-list" class="loading">Загрузка вакансий...</div>
+        </div>
+    </div>
+    
+    <script src="{{ url_for('static', path='/js/region.js') }}?v=3"></script>
+    <script>
+        // Передаем данные из шаблона в JS
+        const HH_AREA_ID = '{{ hh_area_id }}';
+        
+        // Загружаем вакансии при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            loadVacancies(HH_AREA_ID);
+        });
+    </script>
+</body>
+</html>
